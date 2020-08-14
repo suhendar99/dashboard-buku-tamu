@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pengunjung;
+use Illuminate\Support\Facades\Validator;
 use DataTables;
 
 class PengunjungController extends Controller
@@ -12,6 +13,7 @@ class PengunjungController extends Controller
     {
         $this->pengunjung = $pengunjung;
     }
+    /**
     /**
      * Display a listing of the resource.
      *
@@ -23,13 +25,14 @@ class PengunjungController extends Controller
             $data = $this->pengunjung::orderBy('id', 'desc')->get();
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->addColumn('action', function($data){
+                    return '<a href="/buku-tamu/pengunjungBackend/'.$data->id.'/edit" class="btn btn-success btn-sm">Update</a>
+                            <a class="btn btn-danger btn-sm" onclick="sweet('.$data->id.')" data-id="'.$data->id.'">Delete</a>';
+                })
                 ->make(true);
         }
-        $kunjung = Pengunjung::all()->count();
-        $max = Pengunjung::max('suhu');
-        $min = Pengunjung::min('suhu');
-        $avg = Pengunjung::avg('suhu');
-        return view('Dashboard.pengunjung',compact('kunjung','max','min','avg'));
+        // dd($count);
+        return view('Pengunjung.index');
     }
 
     /**
@@ -39,7 +42,7 @@ class PengunjungController extends Controller
      */
     public function create()
     {
-        //
+        return view('Pengunjung.create');
     }
 
     /**
@@ -50,7 +53,22 @@ class PengunjungController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $v = Validator::make($request->all(),[
+            'nama' => 'required',
+            'nik' => 'required|unique:pengunjungs',
+            'instansi' => 'required',
+            'telp' => 'required|numeric',
+            'tujuan' => 'required',
+            'kunjungan' => 'required',
+        ]);
+
+        if ($v->fails()) {
+            return back()->withErrors($v)->withInput();
+        } else {
+            Pengunjung::create($request->all());
+        }
+
+        return back()->with('success','Data Created !');
     }
 
     /**
@@ -72,7 +90,9 @@ class PengunjungController extends Controller
      */
     public function edit($id)
     {
-        //
+        $pengunjung = Pengunjung::findOrFail($id);
+
+        return view('Pengunjung.update',compact('pengunjung'));
     }
 
     /**
@@ -84,7 +104,22 @@ class PengunjungController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $v = Validator::make($request->all(),[
+            'nama' => 'required',
+            'nik' => 'required|unique:pengunjungs,nik,'.$id,
+            'instansi' => 'required',
+            'telp' => 'required|numeric',
+            'tujuan' => 'required',
+            'kunjungan' => 'required',
+        ]);
+
+        if ($v->fails()) {
+            return back()->withErrors($v)->withInput();
+        } else {
+            Pengunjung::findOrFail($id)->update($request->all());
+        }
+
+        return back()->with('success','Data Updated !');
     }
 
     /**
@@ -95,6 +130,8 @@ class PengunjungController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Pengunjung::findOrFail($id)->delete();
+
+        return back();
     }
 }

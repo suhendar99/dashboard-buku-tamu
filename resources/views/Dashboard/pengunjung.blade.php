@@ -117,29 +117,77 @@
             </div>
         </div>
         <div class="row">
-          <div class="col-md-12">
+          <div class="col-md-7">
             <div class="card">
               <div class="card-header ">
-                <h5 class="card-title">Data Pengunjung</h5>
+                    @if (session()->has('success'))
+                    <div class="alert alert-success">
+                        {{ session()->get('success') }}
+                    </div>
+                    @endif
+                    @if (session()->has('failed'))
+                        <div class="alert alert-danger">
+                            {{ session()->get('failed') }}
+                        </div>
+                    @endif
+                <h5 class="card-title border-bottom">Data Pengunjung</h5>
+                <form action="/pengunjung/laporan" method="post">
+                    @csrf
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="input-select">Tanggal Awal</label>
+                                <input type="date" name="tgl_awal" class="form-control  @error('tgl_awal') is-invalid @enderror" >
+                                @error('tgl_awal')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="input-select">Tanggal Akhir</label>
+                                <input type="date" name="tgl_akhir" class="form-control @error('tgl_akhir') is-invalid @enderror" >
+                                @error('tgl_akhir')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-primary" type="submit">Cetak</button>
+                        </div>
+                    </div>
+                </form>
               </div>
-              <div class="card-body ">
+              {{-- <div class="card-body ">
                 <div class="table-responsive">
                     <table id="data_table" class="table table-striped table-bordered" style="width:100%">
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>nik</th>
+                                <th>Tanggal</th>
                                 <th>nama</th>
-                                <th>email</th>
-                                <th>kode_rfid</th>
-                                <th>keterangan</th>
-                                <th>suhu</th>
+                                <th>Instansi</th>
+                                <th>Keterangan</th>
+
                             </tr>
                         </thead>
                     </table>
                 </div>
-              </div>
+              </div> --}}
             </div>
+          </div>
+          <div class="col-md-5">
+              <div class="card">
+                <div id="canvas-holder" style="width:100%">
+                    <canvas id="chart-area"></canvas>
+
+                    <button id="randomizeData">Randomize Data</button>
+                </div>
+              </div>
           </div>
         </div>
       </div>
@@ -157,72 +205,81 @@
   <!-- Control Center for Now Ui Dashboard: parallax effects, scripts for the example pages etc -->
   <script src="/assets/js/paper-dashboard.min.js?v=2.0.1" type="text/javascript"></script><!-- Paper Dashboard DEMO methods, don't include it in your project! -->
   <script src="/assets/demo/demo.js"></script>
-  {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> --}}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
   {{-- <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script> --}}
-  <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
-  <script>
-    $(document).ready(function() {
-      // Javascript method's body can be found in assets/assets-for-demo/js/demo.js
-      demo.initChartsPages();
-    });
-    $(document).ready(function() {
-        $('#data_table').DataTable({
-            processing : true,
-            serverSide : true,
-            ordering : false,
-            pageLength : 10,
-            ajax : "{{ route('index') }}",
-            columns : [
-                {data : 'DT_RowIndex', name: 'DT_RowIndex', searchable:false,orderable:false},
-                {data : 'nik', name: 'nik'},
-                {data : 'nama', name: 'nama'},
-                {data : 'email', name: 'email'},
-                {data : 'kode_rfid', name: 'kode_rfid'},
-                {data : 'keterangan', name: 'keterangan'},
-                {data : 'suhu', name: 'suhu'},
-            ]
-        });
-    });
+  <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+  {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/highcharts/6.0.6/highcharts.js" charset="utf-8"></script> --}}
+    <script src="https://www.chartjs.org/dist/2.9.3/Chart.min.js"></script>
+    <script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+    // $(document).ready(function() {
+    //     $('#data_table').DataTable({
+    //         processing : true,
+    //         serverSide : true,
+    //         ordering : false,
+    //         pageLength : 10,
+    //         ajax : "{{ route('index') }}",
+    //         columns : [
+    //             {data : 'DT_RowIndex', name: 'DT_RowIndex', searchable:false,orderable:false},
+    //             {data : 'tanggal', name: 'tanggal'},
+    //             {data : 'nama', name: 'nama'},
+    //             {data : 'instansi', name: 'instansi'},
+    //             {data : 'keterangan', name: 'keterangan'},
+    //         ]
+    //     });
+    // });
 
-function sweet(id){
-    const formDelete = document.getElementById('formDelete')
-    formDelete.action = '/'+id
+        var url = "{{url('pengunjung/chart ')}}"
+        var randomScalingFactor = function() {
+			return Math.round(Math.random() * 100);
+		};
 
-    console.log(formDelete.action)
-    swal({
-    title: 'Are you sure?',
-    text: "You won't be able to revert this!",
-    type: 'warning',
-    buttons:{
-        confirm: {
-            text : 'Yes, delete it!',
-            className : 'btn btn-success'
-        },
-        cancel: {
-            visible: true,
-            className: 'btn btn-danger'
-        }
-    }
-    }).then((Delete) => {
-        if (Delete) {
-            formDelete.submit();
-            swal({
-                title: 'Deleted!',
-                text: 'Your file has been deleted.',
-                type: 'success',
-                buttons : {
-                    confirm: {
-                        className : 'btn btn-success'
-                    }
-                }
-            });
-        } else {
-            swal.close();
-        }
-    });
-}
+		var config = {
+			type: 'pie',
+			data: {
+				datasets: [{
+					data: [
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+					],
+					backgroundColor: [
+						window.chartColors.red,
+						window.chartColors.yellow,
+						window.chartColors.green,
+						window.chartColors.blue,
+					],
+					label: 'Dataset 1'
+				}],
+				labels: [
+					'Red',
+					'Yellow',
+					'Green',
+					'Blue'
+				]
+			},
+			options: {
+				responsive: true
+			}
+		};
+
+		window.onload = function() {
+			var ctx = document.getElementById('chart-area').getContext('2d');
+			window.myPie = new Chart(ctx, config);
+		};
+
+		document.getElementById('randomizeData').addEventListener('click', function() {
+			config.data.datasets.forEach(function(dataset) {
+				dataset.data = dataset.data.map(function() {
+					return randomScalingFactor();
+				});
+			});
+			window.myPie.update();
+		});
   </script>
 </body>
 
