@@ -7,6 +7,8 @@ use App\Models\Pegawai;
 use Illuminate\Support\Facades\Validator;
 use DataTables;
 use Illuminate\Support\Facades\File;
+use PDF;
+use Carbon\Carbon;
 
 class PegawaiController extends Controller
 {
@@ -68,7 +70,8 @@ class PegawaiController extends Controller
             $name = $request->file('foto');
             $foto = time()."_".$name->getClientOriginalName();
             $request->foto->move(public_path("upload/foto/pegawai"), $foto);
-            Pegawai::create(array_merge($request->only('nama','nip','bagian','status'),['foto'=>'upload/foto/pegawai/'.$foto]));
+            $tanggal = Carbon::now();
+            Pegawai::create(array_merge($request->only('nama','nip','bagian','status','jk'),['foto'=>'upload/foto/pegawai/'.$foto],['tanggal' => $tanggal]));
         }
 
         return back()->with('success','Data Created !');
@@ -137,13 +140,14 @@ class PegawaiController extends Controller
                 $foto->move('upload/foto/pegawai', $name);
 
                 Pegawai::find($request->id)->update(
-                    array_merge($request->only('nama','nip','bagian','status'),
-                        ['foto'=> 'upload/foto/pegawai/'.$name]
+                    array_merge($request->only('nama','nip','bagian','status','jk'),
+                        ['foto'=> 'upload/foto/pegawai/'.$name],
                     )
                 );
                 return back()->with('success','Data Updated !');
             } else {
-                Pegawai::findOrFail($request->id)->update($request->only('nama','nip','bagian','status'));
+                Pegawai::findOrFail($request->id)->update($request->only('nama','nip','bagian','status','jk'),
+            );
                 return back()->with('success','Data Updated !');
             }
         }
@@ -159,5 +163,36 @@ class PegawaiController extends Controller
     {
         Pegawai::find($id)->delete();
         return back();
+    }
+
+    public function laporan(Request $req)
+    {
+        set_time_limit(99999);
+        $v = Validator::make($req->all(), [
+            'awal' => 'required|date',
+            'akhir' => 'required|date',
+        ]);
+        $awal = $req->awal;
+        $akhir = $req->akhir;
+
+        if ($v->fails()) {
+            return back()->withErrors($v)->withInput();
+        }
+        if ($awal > $akhir) {
+             return back()->with('failed','Tanggal Awal Dilarang Melampaui Tanggal Akhir');
+        }
+
+        $data = Pegawai::whereBetween('tanggal',[$req->awal, $req->akhir])->latest()->get();
+        if ($data->isEmpty()) {
+            return back()->with('failed','Data Null !');
+        } else {
+            $pdf = PDF::loadview('Pegawai.laporan_pdf',['data'=>$data, 'awal'=>$awal, 'akhir'=>$akhir]);
+            set_time_limit(300);
+            return $pdf->stream('Monitoring-Report-'.$req->akhir);
+            return view('Pegawai.laporan_pdf',['data'=>$data,'awal'=>$awal, 'akhir'=>$akhir]);
+        }
+
+
+
     }
 }

@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\Models\Pengunjung;
+use Carbon\Carbon;
 
 class PengunjungSeeder extends Seeder
 {
@@ -12,6 +13,7 @@ class PengunjungSeeder extends Seeder
      */
     public function run()
     {
+        $now = Carbon::now();
         Pengunjung::create([
             'nama' => 'Pengunjung 1',
             'nik' => '123123',
@@ -19,6 +21,8 @@ class PengunjungSeeder extends Seeder
             'telp' => '08299183782',
             'tujuan' => 'PT B',
             'kunjungan' => 'Idustri',
+            'jk' => 'L',
+            'tanggal' => $now,
         ]);
     }
 }

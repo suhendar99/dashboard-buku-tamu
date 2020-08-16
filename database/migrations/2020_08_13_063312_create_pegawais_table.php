@@ -18,8 +18,10 @@ class CreatePegawaisTable extends Migration
             $table->string('nama');
             $table->string('nip');
             $table->string('bagian');
+            $table->enum('jk',['L','P']);
             $table->string('foto')->nullable();
             $table->string('status');
+            $table->date('tanggal')->nullable();
             $table->timestamps();
         });
     }

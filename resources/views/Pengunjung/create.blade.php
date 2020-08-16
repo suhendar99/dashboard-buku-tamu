@@ -53,6 +53,18 @@
                                         @enderror
                                     </div>
                                     <div class="form-group form-floating-label">
+                                        <label>Jenis Kelamin</label>
+                                        <select name="jk" id=""class="form-control @error('jk') is-invalid @enderror">
+                                            <option value="L">Laki-Laki</option>
+                                            <option value="P">Perempuan</option>
+                                        </select>
+                                        @error('jk')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                    <div class="form-group form-floating-label">
                                         <label>Asal Instansi</label>
                                         <input type="text" class="form-control @error('instansi') is-invalid @enderror" name="instansi" value = "{{ old('instansi') }}">
                                         @error('instansi')

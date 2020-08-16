@@ -21,6 +21,8 @@ class CreatePengunjungsTable extends Migration
             $table->string('telp');
             $table->string('tujuan');
             $table->string('kunjungan');
+            $table->enum('jk',['L','P']);
+            $table->date('tanggal')->nullable();
             $table->timestamps();
         });
     }

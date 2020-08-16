@@ -71,6 +71,18 @@
                                         @enderror
                                     </div>
                                     <div class="form-group form-floating-label">
+                                        <label>Jenis Kelamin</label>
+                                        <select name="jk" id=""class="form-control @error('jk') is-invalid @enderror">
+                                            <option value="{{ $data->jk }}" {{ $data->jk == 'L' ? 'selected' : false }}>Laki-Laki</option>
+                                            <option value="{{ $data->jk }}" {{ $data->jk == 'P' ? 'selected' : false }}>Perempuan</option>
+                                        </select>
+                                        @error('status')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                    <div class="form-group form-floating-label">
                                         <label>Foto</label>
                                         <input type="file" class="form-control @error('foto') is-invalid @enderror" name="foto" value = "{{ $data->foto }}">
                                         @error('foto')

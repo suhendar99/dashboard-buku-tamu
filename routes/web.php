@@ -15,7 +15,6 @@ use Illuminate\Support\Facades\Http;
 */
 // Route::get('pengunjung/chart','PengunjungController@chart');
 // Route::post('/pengunjung/laporan','PengunjungController@laporan');
-// Route::resource('/', 'PengunjungController');
 
 Auth::routes();
 
@@ -25,10 +24,19 @@ Route::get('/', function () {
     return view('auth.login');
 });
 Route::group(['prefix' => 'buku-tamu','middleware' => 'auth'], function () {
-    Route::get('dashboard','DashboardController@index');
+    Route::get('user/edit','UserController@userupdate')->name('user.updated');
+    Route::put('update_user/{id}','UserController@updateuser')->name('update.user');
+    Route::get('pass/edit','UserController@passupdate')->name('pass.update');
+    Route::put('update_pass/{id}','UserController@updatepass')->name('update.pass');
+
+    Route::get('dashboard','DashboardController@index')->name('dashboard');
+    Route::post('pengunjung/laporan','PengunjungController@laporan')->name('pengunjung.laporan');
     Route::resource('pengunjungBackend', 'PengunjungController');
     Route::post('pegawai/update','PegawaiController@update');
+    Route::post('pegawai/laporan','PegawaiController@laporan');
     Route::resource('pegawai', 'PegawaiController');
-    Route::get('setapp','SetappController@edit');
+    Route::get('setapp/{id}','SetappController@edit')->name('setapp.update');
     Route::post('setapp/update','SetappController@update');
+    Route::get('setlap/{id}','SetlapController@edit')->name('setlap.update');
+    Route::post('setlap/update','SetlapController@update');
 });

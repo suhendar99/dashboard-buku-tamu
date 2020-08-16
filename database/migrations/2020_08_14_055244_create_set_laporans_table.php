@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSetAppsTable extends Migration
+class CreateSetLaporansTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class CreateSetAppsTable extends Migration
      */
     public function up()
     {
-        Schema::create('set_apps', function (Blueprint $table) {
+        Schema::create('set_laporans', function (Blueprint $table) {
             $table->id();
-            $table->string('name_tab');
-            $table->string('icon_tab')->nullable();
-            $table->string('name_app');
-            $table->string('icon_app');
-            $table->string('copyright');
+            $table->string('icon')->nullable();
+            $table->string('header');
+            $table->string('footer');
             $table->timestamps();
         });
     }
@@ -31,6 +29,6 @@ class CreateSetAppsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('set_apps');
+        Schema::dropIfExists('set_laporans');
     }
 }

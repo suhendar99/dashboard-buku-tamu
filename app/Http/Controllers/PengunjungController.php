@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Pengunjung;
 use Illuminate\Support\Facades\Validator;
 use DataTables;
+use Carbon\Carbon;
+use PDF;
 
 class PengunjungController extends Controller
 {
@@ -65,7 +67,8 @@ class PengunjungController extends Controller
         if ($v->fails()) {
             return back()->withErrors($v)->withInput();
         } else {
-            Pengunjung::create($request->all());
+            $tanggal = Carbon::now();
+            Pengunjung::create(array_merge($request->only('nama','nik','instansi','telp','tujuan','jk','kunjungan'),['tanggal'=>$tanggal]));
         }
 
         return back()->with('success','Data Created !');
@@ -116,7 +119,8 @@ class PengunjungController extends Controller
         if ($v->fails()) {
             return back()->withErrors($v)->withInput();
         } else {
-            Pengunjung::findOrFail($id)->update($request->all());
+            $data = Pengunjung::findOrFail($id)->update($request->only('nama','nik','instansi','telp','tujuan','kunjungan','jk'));
+            // dd($data);
         }
 
         return back()->with('success','Data Updated !');
@@ -133,5 +137,36 @@ class PengunjungController extends Controller
         Pengunjung::findOrFail($id)->delete();
 
         return back();
+    }
+
+    public function laporan(Request $req)
+    {
+        set_time_limit(99999);
+        $v = Validator::make($req->all(), [
+            'awal' => 'required|date',
+            'akhir' => 'required|date',
+        ]);
+        $awal = $req->awal;
+        $akhir = $req->akhir;
+
+        if ($v->fails()) {
+            return back()->withErrors($v)->withInput();
+        }
+        if ($awal > $akhir) {
+             return back()->with('failed','Tanggal Awal Dilarang Melampaui Tanggal Akhir');
+        }
+
+        $data = Pengunjung::whereBetween('tanggal',[$req->awal, $req->akhir])->latest()->get();
+        if ($data->isEmpty()) {
+            return back()->with('failed','Data Null !');
+        } else {
+            $pdf = PDF::loadview('Pengunjung.laporan_pdf',['data'=>$data, 'awal'=>$awal, 'akhir'=>$akhir]);
+            set_time_limit(300);
+            return $pdf->stream('Monitoring-Report-'.$req->akhir);
+            return view('Pengunjung.laporan_pdf',['data'=>$data,'awal'=>$awal, 'akhir'=>$akhir]);
+        }
+
+
+
     }
 }

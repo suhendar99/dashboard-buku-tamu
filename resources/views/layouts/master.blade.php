@@ -1,3 +1,6 @@
+@php
+    $data = App\Models\SetApp::find(1)->first();
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,7 +12,8 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <title>SB Admin 2 - Tables</title>
+  <title>{{ $data->name_tab }}</title>
+  <link rel="shortcut icon" type="image/x-icon" href="{{ asset($data->icon_tab) }}" />
 
   <!-- Custom fonts for this template -->
   <link href="/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -57,7 +61,7 @@
       <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
-            <span>Copyright &copy; Your Website 2020</span>
+            <span>Copyright &copy; {{ $data->copyright }} 2020</span>
           </div>
         </div>
       </footer>
@@ -110,7 +114,8 @@
 
   <!-- Custom scripts for all pages-->
   <script src="/assets/js/sb-admin-2.min.js"></script>
-
+  <script src="https://www.chartjs.org/dist/2.9.3/Chart.min.js"></script>
+  <script src="https://www.chartjs.org/samples/latest/utils.js"></script>
   <!-- Page level plugins -->
   <script src="/assets/vendor/datatables/jquery.dataTables.min.js"></script>
   <script src="/assets/vendor/datatables/dataTables.bootstrap4.min.js"></script>

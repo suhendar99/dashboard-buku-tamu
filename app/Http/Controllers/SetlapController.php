@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\SetApp;
+use App\Models\SetLaporan;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\File;
 
-class SetappController extends Controller
+class SetlapController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -59,9 +59,9 @@ class SetappController extends Controller
      */
     public function edit($id)
     {
-        $data = SetApp::findOrFail($id);
+        $data = SetLaporan::findOrFail($id);
 
-        return view('Setapp.index',compact('data'));
+        return view('SetLaporan.index',compact('data'));
     }
 
     /**
@@ -73,43 +73,39 @@ class SetappController extends Controller
      */
     public function update(Request $request)
     {
-        if (!$request->file('icon_tab')) {
+        if (!$request->file('icon')) {
             $v = Validator::make($request->all(),[
-                'name_tab' => 'required',
-                'name_app' => 'required',
-                'icon_app' => 'required',
-                'copyright' => 'required',
+                'header' => 'required',
+                'footer' => 'required',
             ]);
         } else {
             $v = Validator::make($request->all(),[
-                'name_tab' => 'required',
-                'name_app' => 'required',
-                'icon_app' => 'required',
-                'copyright' => 'required',
-                'icon_tab' => 'required|mimes:jpg,jpeg,png',
+                'header' => 'required',
+                'footer' => 'required',
+                'icon' => 'required|mimes:jpg,jpeg,png',
             ]);
         }
         if ($v->fails()) {
             return back()->withErrors($v)->withInput();
         } else {
-            if ($request->file('icon_tab')) {
+            if ($request->file('icon')) {
                 // Delete
-                $foto_public = SetApp::find($request->id);
+                $foto_public = SetLaporan::find($request->id);
                 File::delete($foto_public->foto);
 
                 // Update foto
-                $foto = $request->file('icon_tab');
+                $foto = $request->file('icon');
                 $name = time().'_'.$foto->getClientOriginalName();
-                $foto->move('upload/foto/App', $name);
+                $foto->move('upload/foto/Laporan', $name);
 
-                SetApp::find($request->id)->update(
-                    array_merge($request->only('name_tab','name_app','icon_app','copyright'),
-                        ['icon_tab'=> 'upload/foto/App/'.$name]
+                SetLaporan::find($request->id)->update(
+                    array_merge($request->only('header','footer'),
+                        ['icon'=> 'upload/foto/Laporan/'.$name]
                     )
                 );
                 return back()->with('success','Data Updated !');
             } else {
-                SetApp::findOrFail($request->id)->update($request->only('name_tab','name_app','icon_app','copyright'));
+                SetLaporan::findOrFail($request->id)->update($request->only('header','footer'));
                 return back()->with('success','Data Updated !');
             }
         }
