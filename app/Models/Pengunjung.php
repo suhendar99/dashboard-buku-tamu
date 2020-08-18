@@ -10,6 +10,6 @@ class Pengunjung extends Model
 
     public function aktivitas()
     {
-        return $this->belongsTo('App\Models\AktivitasPengunjung');
+        return $this->hasMany('App\Models\AktivitasPengunjung');
     }
 }

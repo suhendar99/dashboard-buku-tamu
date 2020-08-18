@@ -15,7 +15,9 @@ class CreateAktivitasPengunjungsTable extends Migration
     {
         Schema::create('aktivitas_pengunjungs', function (Blueprint $table) {
             $table->id();
-            $table->dateTime('jadwal_kunjungan');
+            $table->date('jadwal');
+            $table->unsignedBigInteger('id_pengunjung');
+            $table->foreign('id_pengunjung')->references('id')->on('pengunjungs')->onDelete('cascade');
             $table->timestamps();
         });
     }

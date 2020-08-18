@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use DataTables;
 use Carbon\Carbon;
 use PDF;
+use App\Models\AktivitasPengunjung;
 
 class PengunjungController extends Controller
 {
@@ -68,10 +69,20 @@ class PengunjungController extends Controller
             return back()->withErrors($v)->withInput();
         } else {
             $tanggal = Carbon::now();
-            Pengunjung::create(array_merge($request->only('nama','nik','instansi','telp','tujuan','jk','kunjungan'),['tanggal'=>$tanggal]));
+            $pengunjung = Pengunjung::create(array_merge($request->only('nama','nik','instansi','telp','tujuan','jk','kunjungan'),['tanggal'=>$tanggal]));
+
+        //    if ($pengunjung->id) {
+            AktivitasPengunjung::create([
+                'jadwal' => $tanggal,
+                'id_pengunjung' => $pengunjung->id,
+            ]);
+
+            return back()->with('success','Data Created !');
+            // } else {
+            // return back()->with('failed','Data Null !');
+        //    }
         }
 
-        return back()->with('success','Data Created !');
     }
 
     /**

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use DataTables;
+use App\Models\AktivitasPengunjung;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -24,6 +26,9 @@ class DashboardController extends Controller
                 })
                 ->make(true);
         }
-        return view('Dashboard.index');
+        $date = $request->now;
+        $now = Carbon::now();
+        $hari = AktivitasPengunjung::where('jadwal',[$date,$now])->count();
+        return view('Dashboard.index',compact('hari','date'));
     }
 }

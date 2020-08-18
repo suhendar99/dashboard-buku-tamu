@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Http;
 // Route::get('pengunjung/chart','PengunjungController@chart');
 // Route::post('/pengunjung/laporan','PengunjungController@laporan');
 
-Auth::routes();
+Auth::routes(['register'=>false]);
 
 Route::get('/home', 'HomeController@index')->name('home');
 

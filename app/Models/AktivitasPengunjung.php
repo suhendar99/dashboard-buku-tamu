@@ -10,6 +10,6 @@ class AktivitasPengunjung extends Model
 
     public function pengunjung()
     {
-        return $this->hasOne('App\Models\Pengunjung');
+        return $this->belongsTo('App\Models\Pengunjung');
     }
 }
