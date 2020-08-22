@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
+use App\Models\Log;
 
 class LoginController extends Controller
 {
@@ -34,6 +35,49 @@ class LoginController extends Controller
      *
      * @return void
      */
+    protected function sendLoginResponse(Request $request)
+    {
+        $request->session()->regenerate();
+
+        $this->clearLoginAttempts($request);
+        Log::create([
+            'log_name' => 'default',
+            'description' => 'login',
+            'causer_id' => $this->guard()->user()->id,
+            'causer_type' => 'App\User',
+        ]);
+
+
+        if ($response = $this->authenticated($request, $this->guard()->user())) {
+            return $response;
+        }
+
+        return $request->wantsJson()
+                    ? new Response('', 204)
+                    : redirect()->intended($this->redirectPath());
+    }
+    public function logout(Request $request)
+    {
+        Log::create([
+            'log_name' => 'default',
+            'description' => 'logout',
+            'causer_id' => $this->guard()->user()->id,
+            'causer_type' => 'App\User',
+        ]);
+        $this->guard()->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        if ($response = $this->loggedOut($request)) {
+            return $response;
+        }
+
+        return $request->wantsJson()
+            ? new Response('', 204)
+            : redirect('/');
+    }
     public function __construct()
     {
         $this->middleware('guest')->except('logout');

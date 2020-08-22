@@ -36,7 +36,7 @@
               Setting User
             </a>
             <a class="dropdown-item" href="{{ route('pass.update') }}">
-              <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
+              <i class="fas fa-key fa-sm fa-fw mr-2 text-gray-400"></i>
               Setting Password
             </a>
             <div class="dropdown-divider"></div>

@@ -12,15 +12,11 @@ use Carbon\Carbon;
 
 class PegawaiController extends Controller
 {
-    public function __construct(Pegawai $pegawai)
-    {
-        $this->pegawai = $pegawai;
-    }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+        public function __construct(Pegawai $pegawai)
+        {
+            $this->pegawai = $pegawai;
+        }
+
     public function index(Request $request)
     {
         if($request->ajax()){

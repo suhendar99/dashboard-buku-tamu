@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Auth;
+use DataTables;
 
 class UserController extends Controller
 {
@@ -79,5 +80,77 @@ class UserController extends Controller
 
             return back()->with('fail','Password Lama anda Tidak Sesuai!');
         }
+    }
+
+    public function __construct(User $user)
+    {
+        $this->user = $user;
+    }
+
+    public function index(Request $request)
+    {
+        if($request->ajax()){
+            $data = $this->user::orderBy('id', 'desc')->get();
+            return DataTables::of($data)
+                ->addIndexColumn()
+                ->addColumn('action', function($data){
+                    return '<a href="/buku-tamu/user/'.$data->id.'/edit" class="btn btn-success btn-sm">Update</a>
+                            <a class="btn btn-danger btn-sm" onclick="sweet('.$data->id.')" data-id="'.$data->id.'">Delete</a>';
+                })
+                ->make(true);
+        }
+        // dd($count);
+        return view('User.index');
+    }
+
+    public function create()
+    {
+        return view('User.create');
+    }
+
+    public function store(Request $request)
+    {
+        $v = Validator::make($request->all(),[
+            'name' => 'required|',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6',
+        ]);
+
+        if ($v->fails()) {
+            return back()->withErrors($v)->withInput();
+        } else {
+            User::create(array_merge($request->only('name','email','password'),['level'=>2]));
+        }
+        return back()->with('success','Data Created !');
+    }
+
+    public function edit($id)
+    {
+        $data = User::find($id);
+
+        return view('User.update',compact('data'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $v = Validator::make($request->all(),[
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email,'.$id,
+            'password' => 'required|min:6'
+        ]);
+
+        if ($v->fails()) {
+            return back()->withErrors($v)->withInput();
+        } else {
+            User::find($id)->update(array_merge($request->only('name','email','password'),['level'=>2]));
+        }
+
+        return back()->with('success','Data Updated !');
+    }
+
+    public function destroy($id)
+    {
+        User::find($id)->delete();
+        return back();
     }
 }

@@ -6,7 +6,7 @@
     <div class="container-fluid">
 
         <!-- Page Heading -->
-        <h1 class="h3 mb-2 text-gray-800">Table</h1>
+        <h1 class="h3 mb-2 text-gray-800">Table Pengunjung</h1>
 
         <!-- DataTales Example -->
        <div class="card">
@@ -30,7 +30,9 @@
                                                 <th>Telepon</th>
                                                 <th>Tujuan</th>
                                                 <th>Kunjungan</th>
+                                                @if (Auth::user()->level == 1)
                                                 <th>Action</th>
+                                                @endif
                                             </tr>
                                         </thead>
                                     </table>
@@ -44,6 +46,9 @@
                    </div>
                    <div class="col-4" style="margin-top:50px;">
                         <div class="card">
+                            <div class="card-header">
+                                <h6 class="m-0 font-weight-bold text-primary">Report</h6>
+                            </div>
                             <div class="card-body">
                                     @if (session()->has('alert'))
                                     <div class="alert alert-danger">
@@ -103,14 +108,8 @@
     <!-- /.container-fluid -->
     @push('script')
     <script>
-
-    let table = $('#data_table').DataTable({
-        processing : true,
-        serverSide : true,
-        ordering : false,
-        pageLength : 10,
-        ajax : "{{ route('pengunjungBackend.index') }}",
-          columns : [
+        const user = @json(Auth::user());
+        let column =[
             {data : 'DT_RowIndex', name: 'DT_RowIndex', searchable:false,orderable:false},
             {data : 'nama', name: 'nama'},
             {data : 'nik', name: 'nik'},
@@ -119,8 +118,18 @@
             {data : 'telp', name: 'telp'},
             {data : 'tujuan', name: 'tujuan'},
             {data : 'kunjungan', name: 'kunjungan'},
-            {data : 'action', name: 'action'},
+
           ]
+        if (user.level === 1) {
+            column.push({data : 'action', name: 'action'})
+        }
+    let table = $('#data_table').DataTable({
+        processing : true,
+        serverSide : true,
+        ordering : false,
+        pageLength : 10,
+        ajax : "{{ route('pengunjungBackend.index') }}",
+          columns : column
     });
 
     function sweet(id){

@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class AktivitasPengunjung extends Model
+class antri extends Model
 {
+
     protected $guarded = [];
 
     public function pengunjung()
     {
-        return $this->belongsTo('App\Models\Pengunjung','id_pengunjung','id');
+        return $this->belongsTo('App\Models\Pengunjung');
     }
 }

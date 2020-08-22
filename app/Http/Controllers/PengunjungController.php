@@ -9,6 +9,9 @@ use DataTables;
 use Carbon\Carbon;
 use PDF;
 use App\Models\AktivitasPengunjung;
+use App\Models\antri;
+use Mike42\Escpos\Printer;
+use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
 
 class PengunjungController extends Controller
 {
@@ -72,10 +75,10 @@ class PengunjungController extends Controller
             $pengunjung = Pengunjung::create(array_merge($request->only('nama','nik','instansi','telp','tujuan','jk','kunjungan'),['tanggal'=>$tanggal]));
 
         //    if ($pengunjung->id) {
-            AktivitasPengunjung::create([
-                'jadwal' => $tanggal,
-                'id_pengunjung' => $pengunjung->id,
-            ]);
+            // AktivitasPengunjung::create([
+            //     'jadwal' => $tanggal,
+            //     'id_pengunjung' => $pengunjung->id,
+            // ]);
 
             return back()->with('success','Data Created !');
             // } else {
@@ -176,8 +179,52 @@ class PengunjungController extends Controller
             return $pdf->stream('Monitoring-Report-'.$req->akhir);
             return view('Pengunjung.laporan_pdf',['data'=>$data,'awal'=>$awal, 'akhir'=>$akhir]);
         }
-
-
-
     }
+    public function antri(Request $request)
+    {
+        $tanggal = Carbon::now()->format('Y-m-d');
+        // dd($tanggal);
+        $today = antri::where('tanggal',$tanggal)->get();
+        // dd($today);
+        if ($today) {
+            // antri::create([
+            //     'no_antri' => '1'
+            // ]);
+
+            $pengunjung = Pengunjung::first();
+            $max = $today->max('no_antri');
+            $no_antri = $max + 1;
+            // dd($no_antri);
+            $create = antri::create([
+                'no_antri' => $no_antri,
+                'tanggal' => $tanggal,
+                'id_pengunjung' => $pengunjung->id,
+            ]);
+        } else {
+            echo "kosong";
+        }
+
+        if($request->ajax()){
+            try {
+                $ip = '192.168.1.8'; // IP Komputer kita atau printer lain yang masih satu jaringan
+                $printer = 'EPSON TM-U220 Receipt'; // Nama Printer yang di sharing
+                    $connector = new WindowsPrintConnector("smb://" . $ip . "/" . $printer);
+                    $printer = new Printer($connector);
+                    $printer -> text("Email :" . $request->email . "\n");
+                    $printer -> text("Username:" . $request->username . "\n");
+                    $printer -> cut();
+                    $printer -> close();
+                    $response = ['success'=>'true'];
+            } catch (\Exception $e) {
+                    $response = ['success'=>'false'];
+            }
+            return response()
+                ->json($response);
+        }
+        return back();
+        // $max= antri::where('tanggal',$tanggal)->where('no_antri')->get()->max();
+        // dd($max);
+        // return view('Pengunjung.antri',compact('data'));
+    }
+
 }

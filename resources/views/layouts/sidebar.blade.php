@@ -22,28 +22,38 @@
         <!-- Divider -->
         <hr class="sidebar-divider">
 
-        <!-- Heading -->
-        <div class="sidebar-heading">
-          Interface
-        </div>
-
-        <!-- Nav Item - Charts -->
-        <li class="nav-item  {{ Request::is('buku-tamu/pegawai*') ? 'active' : false }}">
-          <a class="nav-link" href="{{ route('pegawai.index') }}">
-            <i class="fas fa-fw fa-chart-area"></i>
-            <span>Data Pegawai</span></a>
+        <li class="nav-item
+         {{ Request::is('buku-tamu/pegawai*') ? 'active' : false }}
+         {{ Request::is('buku-tamu/pengunjungBackend*') ? 'active' : false }}
+         ">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities1" aria-expanded="true" aria-controls="collapseUtilities">
+            <i class="fas fa-table"></i>
+            <span>Data Master</span>
+            </a>
+            <div id="collapseUtilities1" class="collapse
+            {{ Request::is('buku-tamu/pegawai*') ? 'show' : false }}
+            {{ Request::is('buku-tamu/pengunjungBackend*') ? 'show' : false }}
+            " aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item {{ Request::is('buku-tamu/pegawai*') ? 'active' : false }}" href="{{ route('pegawai.index') }}">Data Pegawai</a>
+                <a class="collapse-item {{ Request::is('buku-tamu/pengunjungBackend*') ? 'active' : false }}" href="{{ route('pengunjungBackend.index') }}">Data Pengunjung</a>
+            </div>
+            </div>
         </li>
-
-        <!-- Nav Item - Tables -->
-        <li class="nav-item  {{ Request::is('buku-tamu/pengunjungBackend*') ? 'active' : false }}">
-          <a class="nav-link" href="{{ route('pengunjungBackend.index') }}">
-            <i class="fas fa-fw fa-table"></i>
-            <span>Data Pengunjung</span></a>
-        </li>
+        @if (Auth::user()->level == 1)
+            <li class="nav-item  {{ Request::is('buku-tamu/log*') ? 'active' : false }}">
+            <a class="nav-link" href="{{ route('log.index') }}">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Log Aktivitas</span></a>
+            </li>
+        @endif
          <!-- Nav Item - Utilities Collapse Menu -->
          <li class="nav-item
          {{ Request::is('buku-tamu/setapp*') ? 'active' : false }}
          {{ Request::is('buku-tamu/setlap*') ? 'active' : false }}
+         @if (Auth::user()->level == 1)
+         {{ Request::is('buku-tamu/user*') ? 'active' : false }}
+         @endif
          ">
               <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
                 <i class="fas fa-fw fa-wrench"></i>
@@ -52,10 +62,16 @@
               <div id="collapseUtilities" class="collapse
                 {{ Request::is('buku-tamu/setapp*') ? 'show' : false }}
                 {{ Request::is('buku-tamu/setlap*') ? 'show' : false }}
+                @if (Auth::user()->level == 1)
+                {{ Request::is('buku-tamu/user*') ? 'show' : false }}
+                @endif
               " aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
                   <a class="collapse-item {{ Request::is('buku-tamu/setapp*') ? 'active' : false }}" href="{{ route('setapp.update',1) }}">App</a>
                   <a class="collapse-item {{ Request::is('buku-tamu/setlap*') ? 'active' : false }}" href="{{ route('setlap.update',1) }}">Report</a>
+                  @if (Auth::user()->level == 1)
+                  <a class="collapse-item {{ Request::is('buku-tamu/user*') ? 'active' : false }}" href="{{ route('user.index') }}">Add User</a>
+                  @endif
                 </div>
               </div>
             </li>

@@ -23,14 +23,17 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/', function () {
     return view('auth.login');
 });
-Route::group(['prefix' => 'buku-tamu','middleware' => 'auth'], function () {
+Route::group(['prefix' => 'buku-tamu','middleware' => 'is_admin'], function () {
+    Route::resource('user', 'UserController');
+    Route::get('dashboard','DashboardController@index')->name('dashboard');
+    Route::get('aktivitas','DashboardController@store')->name('aktivitas.store');
     Route::get('user/edit','UserController@userupdate')->name('user.updated');
     Route::put('update_user/{id}','UserController@updateuser')->name('update.user');
     Route::get('pass/edit','UserController@passupdate')->name('pass.update');
     Route::put('update_pass/{id}','UserController@updatepass')->name('update.pass');
-
-    Route::get('dashboard','DashboardController@index')->name('dashboard');
+    Route::resource('log', 'LogController');
     Route::post('pengunjung/laporan','PengunjungController@laporan')->name('pengunjung.laporan');
+    Route::get('pengunjung/antri','PengunjungController@antri')->name('antri');
     Route::resource('pengunjungBackend', 'PengunjungController');
     Route::post('pegawai/update','PegawaiController@update');
     Route::post('pegawai/laporan','PegawaiController@laporan');

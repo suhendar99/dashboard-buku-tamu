@@ -24,7 +24,15 @@
 
   <!-- Custom styles for this page -->
   <link href="/assets/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
-
+  <script src="https://www.chartjs.org/samples/latest/utils.js"></script>
+  <script src="https://www.chartjs.org/dist/2.9.3/Chart.min.js"></script>
+  <style>
+      canvas{
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    }
+  </style>
 </head>
 
 <body id="page-top">

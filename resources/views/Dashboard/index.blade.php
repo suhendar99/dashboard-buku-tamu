@@ -1,6 +1,12 @@
 @php
+    // $now = \Carbon\Carbon::now();
+    // $pengunjung_now = App\Models\Pengunjung::where('tanggal',$now)->count();
     $kunjung = App\Models\Pengunjung::all()->count();
+    $sejak = App\Models\Pengunjung::orderBy('tanggal','asc')->first();
+    // $sekarang = App\Models\Pengunjung::orderBy('tanggal','desc')->first();
+    // dd($sejak);
     $pegawai = App\Models\Pegawai::all()->count();
+    // $pegawai_now = App\Models\Pegawai::where('tanggal')->count();
 @endphp
 @extends('layouts.master')
 
@@ -24,7 +30,8 @@
                   <div class="card-body">
                     <div class="row no-gutters align-items-center">
                       <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Pengunjung</div>
+                          <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Pengunjung</div>
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Sejak {{ $sejak->tanggal }}</div>
                         <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $kunjung }}</div>
                       </div>
                       <div class="col-auto">
@@ -41,8 +48,8 @@
                   <div class="card-body">
                     <div class="row no-gutters align-items-center">
                       <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Aktivitas Hari Ini</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $hari }}</div>
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Pengunjung Hari Ini</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $kunjung_now }}</div>
                       </div>
                       <div class="col-auto">
                         <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -61,7 +68,8 @@
                         <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Aktivitas Bulan Ini</div>
                         <div class="row no-gutters align-items-center">
                           <div class="col-auto">
-                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">0</div>
+                                <a href="/buku-tamu/pengunjung/antri" class="btn btn-primary">Cetak</a>
+                                <a href="{{ route('aktivitas.store') }}" class="btn btn-primary">create</a>
                           </div>
                         </div>
                       </div>
@@ -100,7 +108,7 @@
                 <div class="card shadow mb-4">
                   <!-- Card Header - Dropdown -->
                   <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Last Login</h6>
+                    <h6 class="m-0 font-weight-bold text-primary"> Aktivitas 10 terakhir</h6>
                     <div class="dropdown no-arrow">
                     </div>
                   </div>
@@ -111,9 +119,8 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
+                                    <th>Timestamps</th>
                                     <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Last Login</th>
                                 </tr>
                             </thead>
                         </table>
@@ -127,7 +134,7 @@
                 <div class="card shadow mb-4">
                   <!-- Card Header - Dropdown -->
                   <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Chart</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Gender</h6>
                   </div>
                   <!-- Card Body -->
                   <div class="card-body">
@@ -136,6 +143,18 @@
                     </div>
                   </div>
                 </div>
+              </div>
+              <div class="col-xl-12 col-lg-12">
+                  <div class="card shadow">
+                    <div class="card-header">
+                        <h6 class="m-0 font-weight-bold text-primary">Pengunjung per-hari</h6>
+                    </div>
+                    <div class="card-body">
+                        <div style="width:100%;">
+                            <canvas id="canvas"></canvas>
+                        </div>
+                    </div>
+                  </div>
               </div>
             </div>
 
@@ -152,35 +171,32 @@
         ajax : "{{ route('dashboard') }}",
         columns : [
             {data : 'DT_RowIndex', name: 'DT_RowIndex', searchable:false,orderable:false},
-            {data : 'name', name: 'name'},
-            {data : 'email', name: 'email'},
-            {data : 'last_login_at', name: 'last_login_at'},
+            {data : 'jadwal', name: 'jadwal'},
+            {data : 'pengunjung.nama', name: 'id_pengunjung'},
         ]
     });
 
-    var randomScalingFactor = function() {
-			return Math.round(Math.random() * 100);
-		};
-
+        var perempuan = '{{ $jk1 }}'
+        var laki = '{{ $jk2 }}'
+        // var total = perempuan + laki
 		var config = {
 			type: 'pie',
 			data: {
 				datasets: [{
 					data: [
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
+						// Math.round((laki/total * 100) + "%"),
+                        laki,
+						// Math.round((perempuan/total * 100) + "%"),
+                        perempuan,
 					],
 					backgroundColor: [
 						window.chartColors.red,
-						window.chartColors.green,
 						window.chartColors.blue,
 					],
 				}],
 				labels: [
-					'Red',
-					'A',
-					'B',
+					'Perempuan',
+					'Laki Laki',
 				]
 			},
 			options: {
@@ -191,6 +207,79 @@
 		window.onload = function() {
 			var ctx = document.getElementById('chart-area').getContext('2d');
 			window.myPie = new Chart(ctx, config);
+		};
+
+        var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+		var config = {
+			type: 'line',
+			data: {
+				labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+				datasets: [{
+					label: 'My First dataset',
+					backgroundColor: window.chartColors.red,
+					borderColor: window.chartColors.red,
+					data: [
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor()
+					],
+					fill: false,
+				}, {
+					label: 'My Second dataset',
+					fill: false,
+					backgroundColor: window.chartColors.blue,
+					borderColor: window.chartColors.blue,
+					data: [
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor(),
+						randomScalingFactor()
+					],
+				}]
+			},
+			options: {
+				responsive: true,
+				title: {
+					display: true,
+					text: 'Chart.js Line Chart'
+				},
+				tooltips: {
+					mode: 'index',
+					intersect: false,
+				},
+				hover: {
+					mode: 'nearest',
+					intersect: true
+				},
+				scales: {
+					xAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Month'
+						}
+					}],
+					yAxes: [{
+						display: true,
+						scaleLabel: {
+							display: true,
+							labelString: 'Value'
+						}
+					}]
+				}
+			}
+		};
+
+		window.onload = function() {
+			var ctx = document.getElementById('canvas').getContext('2d');
+			window.myLine = new Chart(ctx, config);
 		};
     </script>
 @endpush
