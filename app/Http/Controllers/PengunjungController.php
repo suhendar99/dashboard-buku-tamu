@@ -193,7 +193,7 @@ class PengunjungController extends Controller
 
             $pengunjung = Pengunjung::first();
             $max = $today->max('no_antri');
-            $no_antri = $max + 1;
+            $no_antri = sprintf("%04s",abs($max + 1));
             // dd($no_antri);
             $create = antri::create([
                 'no_antri' => $no_antri,

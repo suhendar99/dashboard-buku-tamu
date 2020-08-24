@@ -44,15 +44,19 @@
 
               <!-- Earnings (Monthly) Card Example -->
               <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-success shadow h-100 py-2">
+                <div class="card border-left-info shadow h-100 py-2">
                   <div class="card-body">
                     <div class="row no-gutters align-items-center">
                       <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Pengunjung Hari Ini</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $kunjung_now }}</div>
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Pengunjung Hari Ini</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $pengunjung_sekarang }}</div>
+                        <div class="row no-gutters align-items-center">
+                          <div class="col-auto">
+                          </div>
+                        </div>
                       </div>
                       <div class="col-auto">
-                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
                       </div>
                     </div>
                   </div>
@@ -61,20 +65,15 @@
 
               <!-- Earnings (Monthly) Card Example -->
               <div class="col-xl-3 col-md-6 mb-4">
-                <div class="card border-left-info shadow h-100 py-2">
+                <div class="card border-left-success shadow h-100 py-2">
                   <div class="card-body">
                     <div class="row no-gutters align-items-center">
                       <div class="col mr-2">
-                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Aktivitas Bulan Ini</div>
-                        <div class="row no-gutters align-items-center">
-                          <div class="col-auto">
-                                <a href="/buku-tamu/pengunjung/antri" class="btn btn-primary">Cetak</a>
-                                <a href="{{ route('aktivitas.store') }}" class="btn btn-primary">create</a>
-                          </div>
-                        </div>
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Kunjungan Hari Ini</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $kunjung_now }}</div>
                       </div>
                       <div class="col-auto">
-                        <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                        <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
                       </div>
                     </div>
                   </div>
@@ -179,7 +178,7 @@
         var perempuan = '{{ $jk1 }}'
         var laki = '{{ $jk2 }}'
         // var total = perempuan + laki
-		var config = {
+		var configpie = {
 			type: 'pie',
 			data: {
 				datasets: [{
@@ -203,53 +202,31 @@
 				responsive: true
 			}
 		};
-
 		window.onload = function() {
-			var ctx = document.getElementById('chart-area').getContext('2d');
-			window.myPie = new Chart(ctx, config);
+			var pie = document.getElementById('chart-area').getContext('2d');
+			window.myPie = new Chart(pie, configpie);
+
+			var line = document.getElementById('canvas').getContext('2d');
+			window.myLine = new Chart(line, configline);
 		};
 
-        var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-		var config = {
+        // var DAY = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat','Sabtu', 'Minggu'];
+        let data = @json($data);
+
+		var configline = {
 			type: 'line',
 			data: {
-				labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+				labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat','Sabtu', 'Minggu'],
 				datasets: [{
-					label: 'My First dataset',
-					backgroundColor: window.chartColors.red,
-					borderColor: window.chartColors.red,
-					data: [
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor()
-					],
-					fill: false,
-				}, {
-					label: 'My Second dataset',
-					fill: false,
+					label: 'Pengunjung',
 					backgroundColor: window.chartColors.blue,
 					borderColor: window.chartColors.blue,
-					data: [
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor(),
-						randomScalingFactor()
-					],
+					data:data,
+					fill: false,
 				}]
 			},
 			options: {
 				responsive: true,
-				title: {
-					display: true,
-					text: 'Chart.js Line Chart'
-				},
 				tooltips: {
 					mode: 'index',
 					intersect: false,
@@ -262,25 +239,22 @@
 					xAxes: [{
 						display: true,
 						scaleLabel: {
-							display: true,
-							labelString: 'Month'
+							display: false,
+							labelString: 'Day'
 						}
 					}],
 					yAxes: [{
 						display: true,
 						scaleLabel: {
-							display: true,
-							labelString: 'Value'
+							display: false,
+							labelString: 'Data'
 						}
 					}]
 				}
 			}
 		};
 
-		window.onload = function() {
-			var ctx = document.getElementById('canvas').getContext('2d');
-			window.myLine = new Chart(ctx, config);
-		};
+
     </script>
 @endpush
 @endsection
